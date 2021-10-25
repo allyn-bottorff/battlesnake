@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"math"
 	"math/rand"
 )
 
@@ -88,6 +89,36 @@ func checkForWalls(head Coord, board Board, possMoves map[string]bool) {
 	if possMoves["left"] != false {
 		if head.X-1 < 0 {
 			possMoves["left"] = false
+		}
+	}
+
+}
+
+func magn(p1 Coord, p2 Coord) int {
+	c2 := (p1.X-p2.X)*(p1.X-p2.X) + (p1.Y-p2.Y)*(p1.Y-p2.Y)
+	c := math.Sqrt(float64(c2))
+	return int(c)
+}
+
+func moveToFood(head Coord, possMoves map[string]bool, board Board) []string {
+	maxDistIdx := 0
+	for i := 0; i < len(board.Food); i++ {
+		dist := magn(head, board.Food[i])
+		if dist > maxDistIdx {
+			maxDistIdx = i
+
+		}
+	}
+	nearFood := board.Food[maxDistIdx]
+
+	xDist := head.X - nearFood.X
+	yDist := head.Y - nearFood.Y
+
+	move := ""
+
+	if math.Abs(float64(xDist)) > math.Abs(float64(yDist)) {
+		if xDist < 0 {
+			move := "left"
 		}
 	}
 

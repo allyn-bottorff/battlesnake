@@ -342,3 +342,42 @@ func TestCheckForWallsRight(t *testing.T) {
 	}
 
 }
+
+func TestCoordInSnake(t *testing.T) {
+	body := []Coord{
+		{
+			X: 1,
+			Y: 1,
+		},
+		{
+			X: 2,
+			Y: 1,
+		},
+	}
+	testIn := Coord{
+		X: 1,
+		Y: 1,
+	}
+	testOut := Coord{
+		X: 2,
+		Y: 3,
+	}
+
+	if coordInSnake(testIn, body) != true {
+		t.Fatalf("Coordinate in snake not caught")
+
+	}
+
+	if coordInSnake(testOut, body) != false {
+		t.Fatalf("Coodinate not in snake caught")
+	}
+
+}
+
+func TestCheckForSnakes(t *testing.T) {
+	testP := Coord{
+		X: 2,
+		Y: 2,
+	}
+
+}

@@ -5,6 +5,17 @@ import (
 	"math/rand"
 )
 
+func coordInSnake(coord Coord, snake []Coord) bool {
+	var exists bool = false
+	for i := 0; i < len(snake); i++ {
+		if coord == snake[i] {
+			exists = true
+			break
+		}
+	}
+	return exists
+}
+
 func info() BattlesnakeInfoResponse {
 	log.Println("INFO")
 	return BattlesnakeInfoResponse{
@@ -46,7 +57,6 @@ func checkForBody(body []Coord, possMoves map[string]bool) {
 	}
 
 	// check right
-
 	for i := 1; i < len(body); i++ {
 		if head.X+1 == body[i].X && head.Y == body[i].Y {
 			possMoves["right"] = false
@@ -62,6 +72,19 @@ func checkForBody(body []Coord, possMoves map[string]bool) {
 		}
 	}
 
+}
+
+func checkForSnakes(board Board, dir Coord) bool {
+
+	collides := true
+
+	for i := 0; i < len(board.Snakes); i++ {
+		for j := 0; i < len(board.Snakes[i].Body); j++ {
+			collides = coordInSnake(dir, board.Snakes[i].Body)
+			break
+		}
+	}
+	return collides
 }
 
 func checkForWalls(head Coord, board Board, possMoves map[string]bool) {
@@ -104,19 +127,6 @@ func move(state GameState) BattlesnakeMoveResponse {
 		"left":  true,
 		"right": true,
 	}
-
-	// Step 0: Don't let your Battlesnake move back in on it's own neck
-	//myHead := state.You.Body[0] // Coordinates of your head
-	//myNeck := state.You.Body[1] // Coordinates of body piece directly behind your head (your "neck")
-	//if myNeck.X < myHead.X {
-	//	possibleMoves["left"] = false
-	//} else if myNeck.X > myHead.X {
-	//	possibleMoves["right"] = false
-	//} else if myNeck.Y < myHead.Y {
-	//	possibleMoves["down"] = false
-	//} else if myNeck.Y > myHead.Y {
-	//	possibleMoves["up"] = false
-	//}
 
 	checkForBody(state.You.Body, possibleMoves)
 

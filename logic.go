@@ -22,9 +22,9 @@ func info() BattlesnakeInfoResponse {
 	return BattlesnakeInfoResponse{
 		APIVersion: "1",
 		Author:     "MazerRackham",
-		Color:      "0467d1",
-		Head:       "default",
-		Tail:       "default",
+		Color:      "#0467d1",
+		Head:       "shades",
+		Tail:       "pixel",
 	}
 }
 
@@ -140,28 +140,38 @@ func magn(p1 Coord, p2 Coord) int {
 	return int(c)
 }
 
-func moveToFood(head Coord, possMoves map[string]bool, board Board) []string {
-	maxDistIdx := 0
+func moveToFood(head Coord, board Board) string {
+	minDist := 1000
+	minDistIdx := 0
 	for i := 0; i < len(board.Food); i++ {
 		dist := magn(head, board.Food[i])
-		if dist > maxDistIdx {
-			maxDistIdx = i
+		if dist < minDist {
+			minDist = dist
+			minDistIdx = i
 
 		}
 	}
-	nearFood := board.Food[maxDistIdx]
+	nearFood := board.Food[minDistIdx]
 
-	xDist := head.X - nearFood.X
-	yDist := head.Y - nearFood.Y
+	xDist := nearFood.X - head.X
+	yDist := nearFood.Y - head.Y
 
 	move := ""
 
 	if math.Abs(float64(xDist)) > math.Abs(float64(yDist)) {
 		if xDist < 0 {
-			move := "left"
+			move = "left"
+		} else {
+			move = "right"
+		}
+	} else {
+		if yDist < 0 {
+			move = "down"
+		} else {
+			move = "up"
 		}
 	}
-
+	return move
 }
 
 // This function is called on every turn of a game. Use the provided GameState to decide
@@ -202,6 +212,15 @@ func move(state GameState) BattlesnakeMoveResponse {
 		log.Printf("%s MOVE %d: No safe moves detected! Moving %s\n", state.Game.ID, state.Turn, nextMove)
 	} else {
 		nextMove = safeMoves[rand.Intn(len(safeMoves))]
+		if int(state.You.Health) <= (state.Board.Height + state.Board.Width) {
+			log.Printf("%s Low health %d\n", state.Game.ID, state.Turn)
+			if len(state.Board.Food) > 0 {
+				foodMove := moveToFood(state.You.Head, state.Board)
+				if possibleMoves[foodMove] == true {
+					nextMove = foodMove
+				}
+			}
+		}
 		log.Printf("%s MOVE %d: %s\n", state.Game.ID, state.Turn, nextMove)
 	}
 	return BattlesnakeMoveResponse{

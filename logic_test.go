@@ -5,19 +5,23 @@ import (
 )
 
 func equalMoveMaps(m1 map[string]bool, m2 map[string]bool) bool {
+	var matches bool
 	if m1["up"] != m2["up"] || m1["down"] != m2["down"] || m1["left"] != m2["left"] || m1["right"] != m2["right"] {
-		return false
+		matches = false
+	} else {
+		matches = true
 	}
-	return true
+
+	return matches
 }
 
 func TestBattlesnakeInfoResponse(t *testing.T) {
 	testResponse := BattlesnakeInfoResponse{
 		APIVersion: "1",
 		Author:     "MazerRackham",
-		Color:      "0467d1",
-		Head:       "default",
-		Tail:       "default",
+		Color:      "#0467d1",
+		Head:       "shades",
+		Tail:       "pixel",
 	}
 
 	if testResponse != info() {

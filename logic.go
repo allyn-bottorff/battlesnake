@@ -190,12 +190,6 @@ func move(state GameState) BattlesnakeMoveResponse {
 
 	checkForWalls(state.You.Body[0], state.Board, possibleMoves)
 
-	// TODO: Step 3 - Don't collide with others.
-	// Use information in GameState to prevent your Battlesnake from colliding with others.
-
-	// TODO: Step 4 - Find food.
-	// Use information in GameState to seek out and find food.
-
 	// Finally, choose a move from the available safe moves.
 	// TODO: Step 5 - Select a move to make based on strategy, rather than random.
 	var nextMove string
@@ -212,6 +206,18 @@ func move(state GameState) BattlesnakeMoveResponse {
 		log.Printf("%s MOVE %d: No safe moves detected! Moving %s\n", state.Game.ID, state.Turn, nextMove)
 	} else {
 		nextMove = safeMoves[rand.Intn(len(safeMoves))]
+
+		//Battle Mode - eat all the food
+		if len(state.Board.Snakes) > 0 {
+			if len(state.Board.Food) > 0 {
+				foodMove := moveToFood(state.You.Head, state.Board)
+				if possibleMoves[foodMove] == true {
+					nextMove = foodMove
+				}
+			}
+		}
+
+		//Solo mode - only eat when necessary
 		if int(state.You.Health) <= (state.Board.Height + state.Board.Width) {
 			log.Printf("%s Low health %d\n", state.Game.ID, state.Turn)
 			if len(state.Board.Food) > 0 {

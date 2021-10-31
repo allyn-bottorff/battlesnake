@@ -40,24 +40,14 @@ func TestCheckForBodyUp(t *testing.T) {
 			Y: 7,
 		},
 	}
-
-	possibleMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": true,
+	up := Coord{
+		X: 5,
+		Y: 6,
 	}
 
-	expectedMoves := map[string]bool{
-		"up":    false,
-		"down":  true,
-		"left":  true,
-		"right": true,
-	}
-
-	checkForBody(testBody, possibleMoves)
-	if equalMoveMaps(possibleMoves, expectedMoves) != true {
-		t.Fatalf("Possible moves: %v not equal to expected moves. Head at %v", possibleMoves, testBody[0])
+	checkForSelf(testBody, up)
+	if checkForSelf(testBody, up) != true {
+		t.Fatalf("Failed to find self up.")
 
 	}
 
@@ -78,24 +68,13 @@ func TestCheckForBodyDown(t *testing.T) {
 			Y: 3,
 		},
 	}
-
-	possibleMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": true,
+	down := Coord{
+		X: 5,
+		Y: 4,
 	}
 
-	expectedMoves := map[string]bool{
-		"up":    true,
-		"down":  false,
-		"left":  true,
-		"right": true,
-	}
-
-	checkForBody(testBody, possibleMoves)
-	if equalMoveMaps(possibleMoves, expectedMoves) != true {
-		t.Fatalf("Possible moves: %v not equal to expected moves. Head at %v", possibleMoves, testBody[0])
+	if checkForSelf(testBody, down) != true {
+		t.Fatalf("Failed to find self, down")
 
 	}
 
@@ -116,27 +95,14 @@ func TestCheckForBodyLeft(t *testing.T) {
 			Y: 5,
 		},
 	}
-
-	possibleMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": true,
+	left := Coord{
+		X: 4,
+		Y: 5,
 	}
 
-	expectedMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  false,
-		"right": true,
+	if checkForSelf(testBody, left) != true {
+		t.Fatalf("Failed to find self, left.")
 	}
-
-	checkForBody(testBody, possibleMoves)
-	if equalMoveMaps(possibleMoves, expectedMoves) != true {
-		t.Fatalf("Possible moves: %v not equal to expected moves. Head at %v", possibleMoves, testBody[0])
-
-	}
-
 }
 
 func TestCheckForBodyRight(t *testing.T) {
@@ -154,66 +120,13 @@ func TestCheckForBodyRight(t *testing.T) {
 			Y: 5,
 		},
 	}
-
-	possibleMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": true,
+	right := Coord{
+		X: 6,
+		Y: 5,
 	}
 
-	expectedMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": false,
-	}
-
-	checkForBody(testBody, possibleMoves)
-	if equalMoveMaps(possibleMoves, expectedMoves) != true {
-		t.Fatalf("Possible moves: %v not equal to expected moves.", possibleMoves)
-
-	}
-
-}
-
-func TestCheckForBodyTail(t *testing.T) {
-	var testBody = []Coord{
-		{
-			X: 5,
-			Y: 5,
-		},
-		{
-			X: 6,
-			Y: 5,
-		},
-		{
-			X: 7,
-			Y: 5,
-		},
-		{
-			X: 4,
-			Y: 5,
-		},
-	}
-
-	possibleMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  true,
-		"right": true,
-	}
-
-	expectedMoves := map[string]bool{
-		"up":    true,
-		"down":  true,
-		"left":  false,
-		"right": false,
-	}
-
-	checkForBody(testBody, possibleMoves)
-	if equalMoveMaps(possibleMoves, expectedMoves) != true {
-		t.Fatalf("Possible moves: %v not equal to expected moves.", possibleMoves)
+	if checkForSelf(testBody, right) != true {
+		t.Fatalf("Failed to find self, right.")
 
 	}
 
@@ -375,9 +288,62 @@ func TestCoordInSnake(t *testing.T) {
 }
 
 func TestCheckForSnakes(t *testing.T) {
-	testP := Coord{
+	snake1 := []Coord{
+		{
+			X: 1,
+			Y: 1,
+		},
+		{
+			X: 1,
+			Y: 2,
+		},
+		{
+			X: 1,
+			Y: 3,
+		},
+	}
+	snake2 := []Coord{
+		{
+			X: 2,
+			Y: 1,
+		},
+		{
+			X: 2,
+			Y: 2,
+		},
+		{
+			X: 2,
+			Y: 3,
+		},
+	}
+
+	battlesnakes := []Battlesnake{
+		{
+			Body: snake1,
+		},
+		{
+			Body: snake2,
+		},
+	}
+	board := Board{
+		Snakes: battlesnakes,
+	}
+
+	testP1 := Coord{
 		X: 2,
 		Y: 2,
+	}
+	testP2 := Coord{
+		X: 3,
+		Y: 3,
+	}
+
+	if checkForSnakes(board, testP1) != true {
+		t.Fatalf("Failed to find point which is occupied by other snakes.")
+	}
+
+	if checkForSnakes(board, testP2) != false {
+		t.Fatalf("Incorrectly found a point which is unoccupied by other snakes.")
 	}
 
 }

@@ -37,52 +37,69 @@ func end(state GameState) {
 	log.Printf("%s END\n\n", state.Game.ID)
 }
 
-func checkForBody(body []Coord, possMoves map[string]bool) {
+func checkForBodies(body []Coord, board Board, possMoves map[string]bool) {
 	head := body[0]
 
 	// check up
-	for i := 1; i < len(body); i++ {
-		if head.X == body[i].X && head.Y+1 == body[i].Y {
-			possMoves["up"] = false
-			break
-		}
+	up := Coord{
+		X: head.X,
+		Y: head.Y + 1,
+	}
+	if checkForSelf(body, up) == true || checkForSnakes(board, up) == true {
+		possMoves["up"] = false
 	}
 
 	// check down
-	for i := 1; i < len(body); i++ {
-		if head.X == body[i].X && head.Y-1 == body[i].Y {
-			possMoves["down"] = false
-			break
-		}
+	down := Coord{
+		X: head.X,
+		Y: head.Y - 1,
+	}
+	if checkForSelf(body, down) == true || checkForSnakes(board, down) == true {
+		possMoves["down"] = false
 	}
 
 	// check right
-	for i := 1; i < len(body); i++ {
-		if head.X+1 == body[i].X && head.Y == body[i].Y {
-			possMoves["right"] = false
-			break
-		}
+	right := Coord{
+		X: head.X + 1,
+		Y: head.Y,
+	}
+	if checkForSelf(body, right) == true || checkForSnakes(board, right) == true {
+		possMoves["right"] = false
 	}
 
 	// check left
-	for i := 1; i < len(body); i++ {
-		if head.X-1 == body[i].X && head.Y == body[i].Y {
-			possMoves["left"] = false
-			break
-		}
+	left := Coord{
+		X: head.X - 1,
+		Y: head.Y,
+	}
+	if checkForSelf(body, left) == true || checkForSnakes(board, left) == true {
+		possMoves["left"] = false
 	}
 
 }
 
-func checkForSnakes(board Board, dir Coord) bool {
+func checkForSelf(body []Coord, testP Coord) bool {
+	collides := true
+	for i := 1; i < len(body); i++ {
+		if testP.X == body[i].X && testP.Y == body[i].Y {
+			break
+		} else {
+			collides = false
+		}
+	}
+	return collides
+}
+
+func checkForSnakes(board Board, testP Coord) bool {
 
 	collides := true
 
 	for i := 0; i < len(board.Snakes); i++ {
-		for j := 0; i < len(board.Snakes[i].Body); j++ {
-			collides = coordInSnake(dir, board.Snakes[i].Body)
+		collides = coordInSnake(testP, board.Snakes[i].Body)
+		if collides == true {
 			break
 		}
+
 	}
 	return collides
 }
@@ -90,7 +107,7 @@ func checkForSnakes(board Board, dir Coord) bool {
 func checkForWalls(head Coord, board Board, possMoves map[string]bool) {
 	// check up
 	if possMoves["up"] != false {
-		if head.Y+1 >= board.Height-1 {
+		if head.Y+1 >= board.Height {
 			possMoves["up"] = false
 		}
 	}
@@ -102,7 +119,7 @@ func checkForWalls(head Coord, board Board, possMoves map[string]bool) {
 	}
 	// check right
 	if possMoves["right"] != false {
-		if head.X+1 >= board.Width-1 {
+		if head.X+1 >= board.Width {
 			possMoves["right"] = false
 		}
 	}
@@ -128,7 +145,7 @@ func move(state GameState) BattlesnakeMoveResponse {
 		"right": true,
 	}
 
-	checkForBody(state.You.Body, possibleMoves)
+	checkForBodies(state.You.Body, state.Board, possibleMoves)
 
 	checkForWalls(state.You.Body[0], state.Board, possibleMoves)
 

@@ -174,9 +174,38 @@ func moveToFood(head Coord, board Board) string {
 	return move
 }
 
-// This function is called on every turn of a game. Use the provided GameState to decide
-// where to move -- valid moves are "up", "down", "left", or "right".
-// We've provided some code and comments to get you started.
+func getFreeSpace(state GameState, start Coord) int {
+	var toCheck []Coord // array of coordinates to be checked for availability.
+	var newPts []Coord
+	var freeSpaces int
+
+	toCheck = append(toCheck, start)
+
+	for i := 0; i < len(toCheck); i++ {
+		newPts = []Coord{}
+		up := Coord{
+			X: toCheck[i].X
+			Y: toCheck[i].Y+1
+		}
+		down := Coord{
+			X: toCheck[i].X
+			Y: toCheck[i].Y-1
+		}
+		right := Coord{
+			X: toCheck[i].X+1
+			Y: toCheck[i].Y
+		}
+		left := Coord{
+			X: toCheck[i].X-1
+			Y: toCheck[i].Y
+		}
+		if 
+	}
+
+	
+	return freeSpaces
+}
+
 func move(state GameState) BattlesnakeMoveResponse {
 
 	possibleMoves := map[string]bool{

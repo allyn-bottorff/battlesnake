@@ -143,6 +143,10 @@ func HandleEnd(w http.ResponseWriter, r *http.Request) {
 	// Nothing to respond with here
 }
 
+func HandleHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
@@ -150,6 +154,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", HandleIndex)
+	http.HandleFunc("/health", HandleHealth)
 	http.HandleFunc("/start", HandleStart)
 	http.HandleFunc("/move", HandleMove)
 	http.HandleFunc("/end", HandleEnd)

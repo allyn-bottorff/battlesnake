@@ -351,3 +351,25 @@ func TestCheckForSnakes(t *testing.T) {
 	}
 
 }
+
+func TestFreeSpaceEmptyBoard(t *testing.T) {
+	state := GameState{
+		Board: Board{
+			Height: 5,
+			Width:  5,
+			Snakes: []Battlesnake{},
+		},
+	}
+	start := Coord{
+		X: 0,
+		Y: 0,
+	}
+
+	expectedFreeSpace := state.Board.Height * state.Board.Width
+	foundFreeSpace := getFreeSpace(state, start)
+
+	if foundFreeSpace != 24 {
+		t.Fatalf("Found free space: %d, Actual free space, %d", foundFreeSpace, expectedFreeSpace)
+	}
+
+}

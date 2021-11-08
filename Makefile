@@ -6,3 +6,9 @@ arm:
 
 intel:
 	go build
+
+test:
+	go test
+
+watch:
+	ls *.go | entr -c go test

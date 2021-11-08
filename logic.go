@@ -6,6 +6,11 @@ import (
 	"math/rand"
 )
 
+type Node struct {
+	Addr     Coord
+	Children []Node
+}
+
 func coordInSnake(coord Coord, snake []Coord) bool {
 	var exists bool = false
 	for i := 0; i < len(snake); i++ {
@@ -175,35 +180,25 @@ func moveToFood(head Coord, board Board) string {
 }
 
 func getFreeSpace(state GameState, start Coord) int {
-	var toCheck []Coord // array of coordinates to be checked for availability.
-	var newPts []Coord
 	var freeSpaces int
+	/*
+		1. Check if the point on the tbc list is free.
+		2. Add it to the checked list.
+		3. If the point is free, add it to the free list.
+		4. Find adjacent points.
+		5. If the point is free, add it to the TBC list and free list.
+		6. If the point is not free, add it to the checked list.
+		7.
 
-	toCheck = append(toCheck, start)
+	*/
 
-	for i := 0; i < len(toCheck); i++ {
-		newPts = []Coord{}
-		up := Coord{
-			X: toCheck[i].X
-			Y: toCheck[i].Y+1
-		}
-		down := Coord{
-			X: toCheck[i].X
-			Y: toCheck[i].Y-1
-		}
-		right := Coord{
-			X: toCheck[i].X+1
-			Y: toCheck[i].Y
-		}
-		left := Coord{
-			X: toCheck[i].X-1
-			Y: toCheck[i].Y
-		}
-		if 
-	}
+	freeSpaces = 12
 
-	
 	return freeSpaces
+}
+
+func mapSpace(state GameState, start Coord) {
+
 }
 
 func move(state GameState) BattlesnakeMoveResponse {

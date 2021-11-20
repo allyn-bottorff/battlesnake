@@ -174,6 +174,87 @@ func moveToFood(head Coord, board Board) string {
 	return move
 }
 
+func coordInCoords(p Coord, ps []Coord) bool {
+	var exists bool = false
+	for i := 0; i < len(ps); i++ {
+		if p == ps[i] {
+			exists = true
+			break
+		}
+
+	}
+	return exists
+}
+
+func checkForLongerSnake(head Coord, ownLen int32, board Board, possMoves map[string]bool) {
+	if len(board.Snakes) > 1 {
+		for i := 0; i < len(board.Snakes); i++ {
+
+			if ownLen <= board.Snakes[i].Length && head != board.Snakes[i].Body[0] {
+
+				//Possible next moves of a snake that would eat me.
+				var badZone = []Coord{
+					{
+						X: board.Snakes[i].Body[0].X + 1,
+						Y: board.Snakes[i].Body[0].Y,
+					},
+					{
+						X: board.Snakes[i].Body[0].X - 1,
+						Y: board.Snakes[i].Body[0].Y,
+					},
+					{
+						X: board.Snakes[i].Body[0].X,
+						Y: board.Snakes[i].Body[0].Y + 1,
+					},
+					{
+						X: board.Snakes[i].Body[0].X,
+						Y: board.Snakes[i].Body[0].Y - 1,
+					},
+				}
+
+				// check up
+				up := Coord{
+					X: head.X,
+					Y: head.Y + 1,
+				}
+				if coordInCoords(up, badZone) == true {
+					possMoves["up"] = false
+				}
+
+				// check down
+				down := Coord{
+					X: head.X,
+					Y: head.Y - 1,
+				}
+				if coordInCoords(down, badZone) == true {
+					possMoves["down"] = false
+				}
+
+				// check right
+				right := Coord{
+					X: head.X + 1,
+					Y: head.Y,
+				}
+				if coordInCoords(right, badZone) == true {
+					possMoves["right"] = false
+				}
+
+				// check left
+				left := Coord{
+					X: head.X - 1,
+					Y: head.Y,
+				}
+				if coordInCoords(left, badZone) == true {
+					possMoves["left"] = false
+				}
+
+			}
+		}
+
+	}
+
+}
+
 // This function is called on every turn of a game. Use the provided GameState to decide
 // where to move -- valid moves are "up", "down", "left", or "right".
 // We've provided some code and comments to get you started.
@@ -190,8 +271,6 @@ func move(state GameState) BattlesnakeMoveResponse {
 
 	checkForWalls(state.You.Body[0], state.Board, possibleMoves)
 
-	// Finally, choose a move from the available safe moves.
-	// TODO: Step 5 - Select a move to make based on strategy, rather than random.
 	var nextMove string
 
 	safeMoves := []string{}
@@ -200,20 +279,42 @@ func move(state GameState) BattlesnakeMoveResponse {
 			safeMoves = append(safeMoves, move)
 		}
 	}
+	checkForLongerSnake(state.You.Body[0], state.You.Length, state.Board, possibleMoves)
+	safeishMoves := []string{}
+	for move, isSafe := range possibleMoves {
+		if isSafe {
+			safeishMoves = append(safeishMoves, move)
+		}
+	}
 
 	if len(safeMoves) == 0 {
 		nextMove = "down"
 		log.Printf("%s MOVE %d: No safe moves detected! Moving %s\n", state.Game.ID, state.Turn, nextMove)
 	} else {
-		nextMove = safeMoves[rand.Intn(len(safeMoves))]
+		if len(safeishMoves) != 0 {
+			nextMove = safeishMoves[rand.Intn(len(safeishMoves))]
+		} else {
+			nextMove = safeMoves[rand.Intn(len(safeMoves))]
+		}
 
 		//Battle Mode - eat all the food
-		if len(state.Board.Snakes) > 0 {
+		if len(state.Board.Snakes) > 1 {
 			if len(state.Board.Food) > 0 {
 				foodMove := moveToFood(state.You.Head, state.Board)
-				if possibleMoves[foodMove] == true {
-					nextMove = foodMove
+				if len(safeishMoves) != 0 {
+					for i := 0; i < len(safeishMoves); i++ {
+						if foodMove == safeishMoves[i] {
+							nextMove = foodMove
+						}
+					}
+				} else {
+					for i := 0; i < len(safeMoves); i++ {
+						if foodMove == safeMoves[i] {
+							nextMove = foodMove
+						}
+					}
 				}
+
 			}
 		}
 
